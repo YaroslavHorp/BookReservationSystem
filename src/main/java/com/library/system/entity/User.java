@@ -1,4 +1,31 @@
 package com.library.system.entity;
 
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String firstName;
+    private String lastName;
+    private String email;
+
+    private BigDecimal accountBalance;
+
+    public User(String firstName, String lastName, String email, BigDecimal accountBalance) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.accountBalance = accountBalance;
+    }
 }
