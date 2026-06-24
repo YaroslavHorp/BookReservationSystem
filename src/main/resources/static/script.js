@@ -10,14 +10,11 @@ function setupNavigation() {
         link.addEventListener('click', (e) => {
             e.preventDefault();
 
-            // Usuń klasę 'active' ze wszystkich linków i dodaj do klikniętego
             $$('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
 
-            // Ukryj wszystkie sekcje stron
             $$('.page-section').forEach(section => section.classList.remove('active-section'));
 
-            // Pokaż sekcję docelową pobraną z atrybutu 'data-target'
             const targetId = link.getAttribute('data-target');
             $(`#${targetId}`).classList.add('active-section');
         });
