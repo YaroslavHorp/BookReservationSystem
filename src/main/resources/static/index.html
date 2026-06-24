@@ -1,30 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Biblioteka z Menu</title>
+    <link rel="stylesheet" href="styles/style.css">
 </head>
-
 <body>
-    <header>
-        <h1>Our Books:</h1>
-    </header>
-    <main>
+
+<nav class="navbar">
+    <div class="nav-logo">Biblioteka</div>
+    <ul class="nav-menu">
+        <li><a href="#" class="nav-link active" data-target="page-books">Książki</a></li>
+        <li><a href="#" class="nav-link" data-target="page-cart">Koszyk <span id="cart-count">(0)</span></a></li>
+        <li><a href="#" class="nav-link" data-target="page-rented">Wypożyczone</a></li>
+    </ul>
+</nav>
+
+<main class="container">
+    <section id="page-books" class="page-section active-section card">
+        <h2>Dostępne książki w katalogu:</h2>
         <table>
             <thead>
             <tr>
-                <th>Title</th>
-                <th>Author</th>
+                <th>Tytuł</th>
+                <th>Autor</th>
+                <th>Akcja</th>
             </tr>
             </thead>
             <tbody id="books-table-body"></tbody>
         </table>
-    </main>
+    </section>
+
+    <section id="page-cart" class="page-section card">
+        <h2>🛒 Twój Koszyk</h2>
+        <ul id="cart-list" class="cart-list">
+            <li class="empty-cart">Koszyk jest pusty</li>
+        </ul>
+        <button id="checkout-btn" class="btn-primary" disabled>Potwierdź wypożyczenie</button>
+    </section>
+
+    <section id="page-rented" class="page-section card">
+        <h2>Twoje Aktywne Wypożyczenia</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Tytuł</th>
+                <th>Autor</th>
+                <th>Data wypożyczenia</th>
+                <th>Termin zwrotu</th>
+            </tr>
+            </thead>
+            <tbody id="rented-table-body">
+            <tr>
+                <td colspan="4" class="text-center">Brak wypożyczonych książek</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
 
 <script src="script.js" defer></script>
 </body>
-
 </html>
