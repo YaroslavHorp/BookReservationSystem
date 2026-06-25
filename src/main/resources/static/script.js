@@ -3,15 +3,15 @@ const $$ = (selector) => document.querySelectorAll(selector);
 
 let availableBooks = [];
 let cart = [];
-let rentedBooks = [];
+let currentUser = JSON.parse(localStorage.getItem('user')) || null;
 
 // LOGIN - REGISTRATION
-function toggleAuthBoxes(showLogin) {
+window.toggleAuthBoxes = function(showLogin) {
     $('#login-box').style.display = showLogin ? 'block' : 'none';
     $('#register-box').style.display = showLogin ? 'none' : 'block';
 }
 
-async function login() {
+window.login = async function() {
     const email = $('#login-email').value;
     try {
         const response = await fetch("http://localhost:8080/api/auth/login", {
@@ -27,7 +27,7 @@ async function login() {
     } catch (err) { alert(err.message); }
 }
 
-async function register() {
+window.register = async function() {
     const firstName = $('#reg-name').value;
     const lastName = $('#reg-surname').value;
     const email = $('#reg-email').value;
@@ -46,7 +46,7 @@ async function register() {
     } catch (err) { alert(err.message); }
 }
 
-function logout() {
+window.logout = function() {
     localStorage.removeItem('user');
     currentUser = null;
     location.reload();
@@ -57,12 +57,15 @@ function setupNavigation() {
     $$('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             if(link.id === 'btn-logout') return;
-                e.preventDefault();
+            e.preventDefault();
 
             $$('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
+
             $$('.page-section').forEach(s => s.classList.remove('active-section'));
-            $(`#${link.getAttribute('data-target')}`).classList.add('active-section');
+
+            const target = link.getAttribute('data-target');
+            $(`#${target}`).classList.add('active-section');
         });
     });
 }
@@ -70,16 +73,25 @@ function setupNavigation() {
 function initApp() {
     if (currentUser) {
         $('#page-auth').classList.remove('active-section');
-        $('#nav-menu').style.display = 'flex';
-        $('#user-display').textContent = currentUser.firstName;
+        const navMenu = $('#nav-menu');
+        if (navMenu) navMenu.style.display = 'flex';
+
+        const userDisplay = $('#user-display');
+        if (userDisplay) userDisplay.textContent = currentUser.firstName;
+
         $('#page-books').classList.add('active-section');
-        $('[data-target="page-books"]').classList.add('active');
 
         getBooks();
         getFieldsAndRented();
     } else {
         $('#page-auth').classList.add('active-section');
-        $('#nav-menu').style.display = 'none';
+        const navMenu = $('.nav-menu');
+        if(navMenu) navMenu.style.display = 'none';
+
+        // Ukrywamy pozostałe strony jeśli użytkownik nie jest zalogowany
+        $('#page-books').classList.remove('active-section');
+        $('#page-cart').classList.remove('active-section');
+        $('#page-rented').classList.remove('active-section');
     }
 }
 
@@ -89,22 +101,23 @@ async function getBooks() {
         const response = await fetch("http://localhost:8080/api/books");
         availableBooks = await response.json();
         renderAvailableBooks();
-    } catch (error) { console.error(error); }
+    } catch (error) {
+        console.error("Błąd pobierania książek:", error);
+    }
 }
 
 function renderAvailableBooks() {
     const booksTable = $("#books-table-body");
+    if (!booksTable) return;
     booksTable.innerHTML = '';
 
     availableBooks.forEach(book => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
             <td><strong>${book.title}</strong></td>
             <td>${book.author}</td>
             <td><button class="btn-add" onclick="addToCart(${book.id})">+</button></td>
-            `;
-
+        `;
         booksTable.appendChild(row);
     });
 }
@@ -124,6 +137,8 @@ window.removeFromCart = function(id) {
 
 function updateCart() {
     const cartList = $("#cart-list");
+    if(!cartList) return;
+
     cartList.innerHTML = '';
     $("#cart-count").textContent = `(${cart.length})`;
 
@@ -158,14 +173,20 @@ async function checkout() {
             cart = [];
             updateCart();
             getFieldsAndRented();
-            $('[data-target="page-rented"]').click();
+
+            $$('.nav-link').forEach(l => l.classList.remove('active'));
+            $('[data-target="page-rented"]').classList.add('active');
+            $$('.page-section').forEach(s => s.classList.remove('active-section'));
+            $('#page-rented').classList.add('active-section');
         }
     } catch (error) { console.error(error); }
 }
 
 async function getFieldsAndRented() {
     const rentedTable = $("#rented-table-body");
+    if(!rentedTable) return;
     rentedTable.innerHTML = '';
+
     try {
         const response = await fetch(`http://localhost:8080/api/rentals/user/${currentUser.id}`);
         const rentals = await response.json();
@@ -191,6 +212,10 @@ async function getFieldsAndRented() {
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     initApp();
-    $("#checkout-btn").addEventListener('click', checkout);
-    $("#btn-logout").addEventListener('click', logout);
+
+    const checkoutBtn = $("#checkout-btn");
+    const btnLogout = $("#btn-logout");
+
+    if(checkoutBtn) checkoutBtn.addEventListener('click', checkout);
+    if(btnLogout) btnLogout.addEventListener('click', window.logout);
 });

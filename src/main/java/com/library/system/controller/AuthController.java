@@ -19,7 +19,7 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
-
+    @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         if(userRepository.findByEmail(user.getEmail()).isPresent()){
             return ResponseEntity.badRequest().body(Map.of("message", "Email already exists"));
@@ -29,6 +29,7 @@ public class AuthController {
         return ResponseEntity.ok(savedUser);
     }
 
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String email = credentials.get("email");
         return userRepository.findByEmail(email)
