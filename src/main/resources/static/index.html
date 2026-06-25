@@ -14,10 +14,29 @@
         <li><a href="#" class="nav-link active" data-target="page-books">Książki</a></li>
         <li><a href="#" class="nav-link" data-target="page-cart">Koszyk <span id="cart-count">(0)</span></a></li>
         <li><a href="#" class="nav-link" data-target="page-rented">Wypożyczone</a></li>
+        <li><a href="#" id="btn-logout" class="nav-link logout">Wyloguj (<span id="user-display"></span>)</a></li>
     </ul>
 </nav>
 
 <main class="container">
+    <section id="page-auth" class="page-section active-section auth-container">
+        <div class="card" id="login-box">
+            <h2>Zaloguj się</h2>
+            <input type="email" id="login-email" placeholder="E-mail">
+            <button onclick="login()" class="btn-primary">Zaloguj</button>
+            <p>Nie masz konta? <a href="#" onclick="toggleAuthBoxes(false)">Zarejestruj się</a></p>
+        </div>
+
+        <div class="card" id="register-box" style="display: none;">
+            <h2>Zarejestruj się</h2>
+            <input type="text" id="reg-name" placeholder="Imię">
+            <input type="text" id="reg-surname" placeholder="Nazwisko">
+            <input type="email" id="reg-email" placeholder="E-mail">
+            <button onclick="register()" class="btn-primary">Zarejestruj i zaloguj</button>
+            <p>Masz już konto? <a href="#" onclick="toggleAuthBoxes(true)">Zaloguj się</a></p>
+        </div>
+    </section>
+
     <section id="page-books" class="page-section active-section card">
         <h2>Dostępne książki w katalogu:</h2>
         <table>

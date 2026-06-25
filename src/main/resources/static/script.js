@@ -5,37 +5,45 @@ let availableBooks = [];
 let cart = [];
 let rentedBooks = [];
 
+
+// NAVIGATION AND INITIALIZATION
 function setupNavigation() {
     $$('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
-            e.preventDefault();
+            if(link.id === 'btn-logout') return;
+                e.preventDefault();
 
             $$('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
-
-            $$('.page-section').forEach(section => section.classList.remove('active-section'));
-
-            const targetId = link.getAttribute('data-target');
-            $(`#${targetId}`).classList.add('active-section');
+            $$('.page-section').forEach(s => s.classList.remove('active-section'));
+            $(`#${link.getAttribute('data-target')}`).classList.add('active-section');
         });
     });
 }
 
+function initApp() {
+    if (currentUser) {
+        $('#page-auth').classList.remove('active-section');
+        $('#nav-menu').style.display = 'flex';
+        $('#user-display').textContent = currentUser.firstName;
+        $('#page-books').classList.add('active-section');
+        $('[data-target="page-books"]').classList.add('active');
+
+        getBooks();
+        getFieldsAndRented();
+    } else {
+        $('#page-auth').classList.add('active-section');
+        $('#nav-menu').style.display = 'none';
+    }
+}
+
+// LOGIC
 async function getBooks() {
-    const booksTable = $("#books-table-body");
     try {
         const response = await fetch("http://localhost:8080/api/books");
         availableBooks = await response.json();
         renderAvailableBooks();
-    } catch (error) {
-        console.error("Problem ze Springiem, ładuję dane demonstracyjne:", error);
-        availableBooks = [
-            {id: 1, title: "Wiedźmin: Ostatnie życzenie", author: "Andrzej Sapkowski"},
-            {id: 2, title: "Clean Code", author: "Robert C. Martin"},
-            {id: 3, title: "Hobbit", author: "J.R.R. Tolkien"}
-        ];
-        renderAvailableBooks();
-    }
+    } catch (error) { console.error(error); }
 }
 
 function renderAvailableBooks() {
@@ -44,15 +52,16 @@ function renderAvailableBooks() {
 
     availableBooks.forEach(book => {
         const row = document.createElement("tr");
+
         row.innerHTML = `
             <td><strong>${book.title}</strong></td>
             <td>${book.author}</td>
             <td><button class="btn-add" onclick="addToCart(${book.id})">+</button></td>
-        `;
+            `;
+
         booksTable.appendChild(row);
     });
 }
-
 
 window.addToCart = function(id) {
     const book = availableBooks.find(b => b.id === id);
@@ -69,78 +78,73 @@ window.removeFromCart = function(id) {
 
 function updateCart() {
     const cartList = $("#cart-list");
-    const checkoutBtn = $("#checkout-btn");
-    const cartCount = $("#cart-count");
-
     cartList.innerHTML = '';
-    cartCount.textContent = `(${cart.length})`;
+    $("#cart-count").textContent = `(${cart.length})`;
 
     if (cart.length === 0) {
         cartList.innerHTML = '<li class="empty-cart">Koszyk jest pusty</li>';
-        checkoutBtn.disabled = true;
+        $("#checkout-btn").disabled = true;
         return;
     }
 
     cart.forEach(book => {
         const li = document.createElement("li");
         li.innerHTML = `
-            <span>${book.title} - <em>${book.author}</em></span>
+            <span>${book.title}</span>
             <button class="btn-remove" onclick="removeFromCart(${book.id})">&times;</button>
         `;
         cartList.appendChild(li);
     });
-
-    checkoutBtn.disabled = false;
+    $("#checkout-btn").disabled = false;
 }
 
-function checkout() {
-    const today = new Date();
-    const returnDate = new Date();
-    returnDate.setDate(today.getDate() + 14);
-
-    const formattedToday = today.toLocaleDateString('pl-PL');
-    const formattedReturn = returnDate.toLocaleDateString('pl-PL');
-
-    cart.forEach(book => {
-        rentedBooks.push({
-            title: book.title,
-            author: book.author,
-            rentDate: formattedToday,
-            dueDate: formattedReturn
+async function checkout() {
+    try {
+        const response = await fetch("http://localhost:8080/api/rentals/borrow", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                userId: currentUser.id,
+                bookIds: cart.map(b => b.id)
+            })
         });
-    });
-
-    cart = [];
-    updateCart();
-    renderRentedBooks();
-
-
-    $('[data-target="page-rented"]').click();
+        if(response.ok) {
+            cart = [];
+            updateCart();
+            getFieldsAndRented();
+            $('[data-target="page-rented"]').click();
+        }
+    } catch (error) { console.error(error); }
 }
 
-function renderRentedBooks() {
+async function getFieldsAndRented() {
     const rentedTable = $("#rented-table-body");
     rentedTable.innerHTML = '';
+    try {
+        const response = await fetch(`http://localhost:8080/api/rentals/user/${currentUser.id}`);
+        const rentals = await response.json();
 
-    if (rentedBooks.length === 0) {
-        rentedTable.innerHTML = `<tr><td colspan="4" class="text-center">Brak wypożyczonych książek</td></tr>`;
-        return;
-    }
+        if(rentals.length === 0) {
+            rentedTable.innerHTML = `<tr><td colspan="4" class="text-center">Brak wypożyczeń</td></tr>`;
+            return;
+        }
 
-    rentedBooks.forEach(book => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td><strong>${book.title}</strong></td>
-            <td>${book.author}</td>
-            <td><span class="badge badge-info">${book.rentDate}</span></td>
-            <td><span class="badge badge-warning">${book.dueDate}</span></td>
-        `;
-        rentedTable.appendChild(row);
-    });
+        rentals.forEach(r => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><strong>${r.book.title}</strong></td>
+                <td>${r.book.author}</td>
+                <td><span class="badge badge-info">${r.rentDate}</span></td>
+                <td><span class="badge badge-warning">${r.dueDate}</span></td>
+            `;
+            rentedTable.appendChild(row);
+        });
+    } catch (err) { console.error(err); }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
-    getBooks();
+    initApp();
     $("#checkout-btn").addEventListener('click', checkout);
+    $("#btn-logout").addEventListener('click', logout);
 });
