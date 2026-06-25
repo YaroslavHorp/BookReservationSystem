@@ -5,6 +5,52 @@ let availableBooks = [];
 let cart = [];
 let rentedBooks = [];
 
+// LOGIN - REGISTRATION
+function toggleAuthBoxes(showLogin) {
+    $('#login-box').style.display = showLogin ? 'block' : 'none';
+    $('#register-box').style.display = showLogin ? 'none' : 'block';
+}
+
+async function login() {
+    const email = $('#login-email').value;
+    try {
+        const response = await fetch("http://localhost:8080/api/auth/login", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email })
+        });
+        if (!response.ok) throw new Error("Błędny email!");
+
+        currentUser = await response.json();
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        initApp();
+    } catch (err) { alert(err.message); }
+}
+
+async function register() {
+    const firstName = $('#reg-name').value;
+    const lastName = $('#reg-surname').value;
+    const email = $('#reg-email').value;
+
+    try {
+        const response = await fetch("http://localhost:8080/api/auth/register", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ firstName, lastName, email })
+        });
+        if (!response.ok) throw new Error("Błąd rejestracji!");
+
+        currentUser = await response.json();
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        initApp();
+    } catch (err) { alert(err.message); }
+}
+
+function logout() {
+    localStorage.removeItem('user');
+    currentUser = null;
+    location.reload();
+}
 
 // NAVIGATION AND INITIALIZATION
 function setupNavigation() {
