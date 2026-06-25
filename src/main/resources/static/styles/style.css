@@ -69,6 +69,47 @@ body {
     display: block;
 }
 
+/*REGISTRATION AND LOGIN*/
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}
+
+.auth-container .card {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.auth-container p {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.auth-container a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-link.logout {
+    color: #e74c3c;
+}
+.nav-link.logout:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
 /* MAIN */
 .container {
     max-width: 900px;
