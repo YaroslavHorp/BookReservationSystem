@@ -74,26 +74,30 @@ function setupNavigation() {
 
 function initApp() {
     if (currentUser) {
+        $('#page-auth').style.display = 'none';
         $('#page-auth').classList.remove('active-section');
+
         const navMenu = $('#nav-menu');
         if (navMenu) navMenu.style.display = 'flex';
 
         const userDisplay = $('#user-display');
         if (userDisplay) userDisplay.textContent = currentUser.firstName;
 
+        $('#page-books').style.display = 'block';
         $('#page-books').classList.add('active-section');
 
         getBooks();
         getFieldsAndRented();
     } else {
+        $('#page-auth').style.display = 'flex';
         $('#page-auth').classList.add('active-section');
+
         const navMenu = $('.nav-menu');
         if(navMenu) navMenu.style.display = 'none';
 
-        // Ukrywamy pozostałe strony jeśli użytkownik nie jest zalogowany
-        $('#page-books').classList.remove('active-section');
-        $('#page-cart').classList.remove('active-section');
-        $('#page-rented').classList.remove('active-section');
+        $('#page-books').style.display = 'none';
+        $('#page-cart').style.display = 'none';
+        $('#page-rented').style.display = 'none';
     }
 }
 

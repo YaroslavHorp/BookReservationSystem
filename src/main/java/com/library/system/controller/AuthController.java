@@ -2,6 +2,7 @@ package com.library.system.controller;
 
 import com.library.system.entity.User;
 import com.library.system.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
+    @Autowired
     private UserRepository userRepository;
 
     public AuthController(UserRepository userRepository) {
@@ -33,7 +35,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String email = credentials.get("email");
         return userRepository.findByEmail(email)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(401).body((User) Map.of("message", "Nie znaleziono użytkownika!")));
+                .map(user -> ResponseEntity.ok((Object) user))
+                .orElse(ResponseEntity.status(404).body(Map.of("message", "Nie znaleziono użytkownika!")));
     }
 }
