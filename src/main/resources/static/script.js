@@ -64,10 +64,18 @@ function setupNavigation() {
             $$('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
 
-            $$('.page-section').forEach(s => s.classList.remove('active-section'));
+            $$('.page-section').forEach(s => {
+                s.classList.remove('active-section');
+                s.style.display = 'none';
+            });
 
+            // Pokazujemy tylko tę jedną wybraną sekcję
             const target = link.getAttribute('data-target');
-            $(`#${target}`).classList.add('active-section');
+            const targetSection = $(`#${target}`);
+            if (targetSection) {
+                targetSection.classList.add('active-section');
+                targetSection.style.display = 'block';
+            }
         });
     });
 }

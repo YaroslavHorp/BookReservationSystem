@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -32,10 +33,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<?> login(@RequestBody java.util.Map<String, String> credentials) {
+        if (credentials == null || !credentials.containsKey("email")) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", "Brak przekazanego adresu e-mail!"));
+        }
+
         String email = credentials.get("email");
-        return userRepository.findByEmail(email)
-                .map(user -> ResponseEntity.ok((Object) user))
-                .orElse(ResponseEntity.status(404).body(Map.of("message", "Nie znaleziono użytkownika!")));
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            return ResponseEntity.ok(userOptional.get());
+        } else {
+            return ResponseEntity.status(404).body(java.util.Map.of("message", "Nie znaleziono użytkownika!"));
+        }
     }
 }

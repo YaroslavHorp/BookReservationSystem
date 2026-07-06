@@ -62,11 +62,19 @@ body {
 }
 
 .page-section {
-    display: none;
+    display: none !important;
+    width: 100%;
 }
 
 .page-section.active-section {
     display: flex !important;
+}
+
+#page-auth.active-section {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
 }
 
 /*REGISTRATION AND LOGIN*/
@@ -113,12 +121,11 @@ body {
 
 /* MAIN */
 .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - 60px);
+    display: block;
     width: 100%;
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
 }
 
 .card {
