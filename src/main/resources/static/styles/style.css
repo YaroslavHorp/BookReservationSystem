@@ -66,7 +66,7 @@ body {
 }
 
 .page-section.active-section {
-    display: block;
+    display: flex !important;
 }
 
 /*REGISTRATION AND LOGIN*/
@@ -74,7 +74,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 50vh;
+    min-height: 80vh;
+    width: 100%;
 }
 
 .auth-container .card {
@@ -112,9 +113,12 @@ body {
 
 /* MAIN */
 .container {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 0 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+    width: 100%;
 }
 
 .card {
