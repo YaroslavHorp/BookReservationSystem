@@ -2,7 +2,9 @@ package com.library.system.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
@@ -20,6 +22,8 @@ public class User {
     private String lastName;
     private String email;
 
+    @Getter
+    @Setter
     private BigDecimal accountBalance;
 
     public User(String firstName, String lastName, String email, BigDecimal accountBalance) {
@@ -28,4 +32,5 @@ public class User {
         this.email = email;
         this.accountBalance = accountBalance;
     }
+
 }

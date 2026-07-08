@@ -25,10 +25,10 @@ public class DataInitializer implements CommandLineRunner {
         if (bookRepository.count() == 0) {
             System.out.println("Data base is empty. Adding new books...");
 
-            bookRepository.save(new Book("Wiedźmin: Ostatnie życzenie", "Andrzej Sapkowski", "9788375780635", 5));
-            bookRepository.save(new Book("Hobbit, czyli tam i z powrotem", "J.R.R. Tolkien", "9788324404551", 3));
-            bookRepository.save(new Book("Mistrz i Małgorzata", "Michaił Bułhakow", "9788374958318", 2));
-            bookRepository.save(new Book("Clean Code (Czysty Kod)", "Robert C. Martin", "9788328302341", 4));
+            bookRepository.save(new Book("Wiedźmin: Ostatnie życzenie", "Andrzej Sapkowski", "9788375780635", 20, 5));
+            bookRepository.save(new Book("Hobbit, czyli tam i z powrotem", "J.R.R. Tolkien", "9788324404551", 15, 3));
+            bookRepository.save(new Book("Mistrz i Małgorzata", "Michaił Bułhakow", "9788374958318", 12, 2));
+            bookRepository.save(new Book("Clean Code (Czysty Kod)", "Robert C. Martin", "9788328302341", 8, 4));
 
             System.out.println("Added new books...");
         }

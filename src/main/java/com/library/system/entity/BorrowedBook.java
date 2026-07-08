@@ -1,6 +1,7 @@
 package com.library.system.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -10,19 +11,25 @@ import java.time.LocalDate;
 public class BorrowedBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private Long Id;
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     @Setter
+    @Getter
     private User user;
 
     @ManyToOne
     @JoinColumn(name="book_id", nullable = false)
     @Setter
+    @Getter
     private Book book;
 
+    @Getter
     private LocalDate rentDate;
+
+    @Getter
     private LocalDate dueDate;
 
     public BorrowedBook() {}
@@ -34,10 +41,4 @@ public class BorrowedBook {
         this.dueDate = dueDate;
     }
 
-    //Getters
-    public Long getId() { return Id; }
-    public User getUser() { return user; }
-    public Book getBook() { return book; }
-    public LocalDate getRentDate() { return rentDate; }
-    public LocalDate getDueDate() { return dueDate; }
 }
