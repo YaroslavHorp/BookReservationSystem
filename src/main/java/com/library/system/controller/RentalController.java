@@ -6,7 +6,9 @@ import com.library.system.entity.User;
 import com.library.system.repository.BookRepository;
 import com.library.system.repository.BorrowedBookRepository;
 import com.library.system.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -17,16 +19,13 @@ import java.util.Map;
 @RequestMapping("/api/rentals")
 @CrossOrigin
 public class RentalController {
+    @Autowired
+    private BorrowedBookRepository borrowedBookRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private BookRepository bookRepository;
 
-    private final BorrowedBookRepository borrowedBookRepository;
-    private final UserRepository userRepository;
-    private final BookRepository bookRepository;
-
-    public RentalController(BorrowedBookRepository bbr, UserRepository ur, BookRepository br) {
-        this.borrowedBookRepository = bbr;
-        this.userRepository = ur;
-        this.bookRepository = br;
-    }
 
     @GetMapping("/user/{userId}")
     public List<BorrowedBook> getUserRentals(@PathVariable Long userId) {
@@ -34,20 +33,52 @@ public class RentalController {
     }
 
     @PostMapping("/borrow")
+    @Transactional
     public ResponseEntity<?> borrowBooks(@RequestBody Map<String, Object> request) {
-        Long userId = Long.valueOf(request.get("userId").toString());
-        List<Integer> bookIds = (List<Integer>) request.get("bookIds");
+        try {
+            Long userId = Long.valueOf(request.get("userId").toString());
 
-        User user = userRepository.findById(userId).orElseThrow();
+            @SuppressWarnings("unchecked")
+            List<Integer> bookIdsIntegers = (List<Integer>) request.get("bookIds");
+            List<Long> bookIds = bookIdsIntegers.stream()
+                    .map(Long::valueOf)
+                    .toList();
 
-        for (Integer bookId : bookIds) {
-            Book book = bookRepository.findById(Long.valueOf(bookId)).orElseThrow();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-            BorrowedBook rental = new BorrowedBook(user, book, LocalDate.now(), LocalDate.now().plusDays(14));
-            borrowedBookRepository.save(rental);
+            List<Book> booksToBorrow = bookRepository.findAllById(bookIds);
+
+            double totalCartPrice = booksToBorrow.stream()
+                    .mapToDouble(Book::getPrice)
+                    .sum();
+
+            if (user.getAccountBalance() < totalCartPrice) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "You are not enough balance"));
+            }
+
+            user.setAccountBalance(user.getAccountBalance() - totalCartPrice);
+            userRepository.save(user);
+
+            for (Book book : booksToBorrow) {
+                BorrowedBook rental = new BorrowedBook();
+                rental.setBook(book);
+                rental.setUser(user);
+                rental.setRentDate(LocalDate.now());
+                rental.setDueDate(LocalDate.now().plusDays(14));
+                borrowedBookRepository.save(rental);
+
+            }
+
+            return ResponseEntity.ok(java.util.Map.of(
+                    "message", "rental successfully!",
+                    "newBalance", user.getAccountBalance()
+            ));
+        }catch (Exception e){
+            return ResponseEntity.internalServerError()
+                    .body(java.util.Map.of("message", "Server error: " + e.getMessage()));
         }
-
-        return ResponseEntity.ok(Map.of("message", "Wypożyczono pomyślnie!"));
     }
 
 }

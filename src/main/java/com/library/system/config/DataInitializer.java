@@ -36,9 +36,9 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.count() == 0) {
             System.out.println("Data base is empty. Adding new users...");
 
-            userRepository.save(new User("Jan", "Kowalski", "jan.kowalski@email.com", new BigDecimal(200)));
-            userRepository.save(new User("Anna", "Nowak", "anna.nowak@email.com", new BigDecimal(50)));
-            userRepository.save(new User("Jaroslaw", "Andrzejczyk", "jaroslaw.andrzejczyk@email.com", new BigDecimal(100)));
+            userRepository.save(new User("Jan", "Kowalski", "jan.kowalski@email.com",200));
+            userRepository.save(new User("Anna", "Nowak", "anna.nowak@email.com", 50));
+            userRepository.save(new User("Jaroslaw", "Andrzejczyk", "jaroslaw.andrzejczyk@email.com", 100));
         }
     }
 }

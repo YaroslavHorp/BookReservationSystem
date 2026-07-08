@@ -23,8 +23,7 @@ public class Book {
     private String isbn;
     private int availableCopies;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private double price;
 
     public Book(String title, String author, String isbn, double price, int availableCopies) {

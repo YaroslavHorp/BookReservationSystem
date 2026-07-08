@@ -16,20 +16,18 @@ public class BorrowedBook {
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
-    @Setter
-    @Getter
+    @Setter @Getter
     private User user;
 
     @ManyToOne
     @JoinColumn(name="book_id", nullable = false)
-    @Setter
-    @Getter
+    @Setter @Getter
     private Book book;
 
-    @Getter
+    @Getter @Setter
     private LocalDate rentDate;
 
-    @Getter
+    @Getter @Setter
     private LocalDate dueDate;
 
     public BorrowedBook() {}

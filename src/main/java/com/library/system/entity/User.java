@@ -16,6 +16,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter @Setter
     private Long id;
 
     private String firstName;
@@ -24,9 +25,9 @@ public class User {
 
     @Getter
     @Setter
-    private BigDecimal accountBalance;
+    private double accountBalance;
 
-    public User(String firstName, String lastName, String email, BigDecimal accountBalance) {
+    public User(String firstName, String lastName, String email, double accountBalance) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
