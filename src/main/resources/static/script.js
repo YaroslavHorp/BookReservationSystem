@@ -69,7 +69,6 @@ function setupNavigation() {
                 s.style.display = 'none';
             });
 
-            // Pokazujemy tylko tę jedną wybraną sekcję
             const target = link.getAttribute('data-target');
             const targetSection = $(`#${target}`);
             if (targetSection) {
@@ -82,30 +81,48 @@ function setupNavigation() {
 
 function initApp() {
     if (currentUser) {
-        $('#page-auth').style.display = 'none';
-        $('#page-auth').classList.remove('active-section');
+        const authPage = $('#page-auth');
+        if (authPage) {
+            authPage.style.display = 'none';
+            authPage.classList.remove('active-section');
+        }
 
-        const navMenu = $('#nav-menu');
+        const navMenu = $('#nav-menu') || $('.nav-menu');
         if (navMenu) navMenu.style.display = 'flex';
 
         const userDisplay = $('#user-display');
         if (userDisplay) userDisplay.textContent = currentUser.firstName;
 
-        $('#page-books').style.display = 'block';
-        $('#page-books').classList.add('active-section');
+        const userBalance = $('#user-balance');
+        if (userBalance) {
+            const balanceVal = currentUser.accountBalance ?? currentUser.balance ?? 0;
+            userBalance.textContent = Number(balanceVal).toFixed(2);
+        }
+
+        const booksPage = $('#page-books');
+        if (booksPage) {
+            booksPage.style.display = 'block';
+            booksPage.classList.add('active-section');
+        }
+
+        if ($('#page-cart')) $('#page-cart').style.display = 'none';
+        if ($('#page-rented')) $('#page-rented').style.display = 'none';
 
         getBooks();
         getFieldsAndRented();
     } else {
-        $('#page-auth').style.display = 'flex';
-        $('#page-auth').classList.add('active-section');
+        const authPage = $('#page-auth');
+        if (authPage) {
+            authPage.style.display = 'flex';
+            authPage.classList.add('active-section');
+        }
 
-        const navMenu = $('.nav-menu');
-        if(navMenu) navMenu.style.display = 'none';
+        const navMenu = $('#nav-menu') || $('.nav-menu');
+        if (navMenu) navMenu.style.display = 'none';
 
-        $('#page-books').style.display = 'none';
-        $('#page-cart').style.display = 'none';
-        $('#page-rented').style.display = 'none';
+        if ($('#page-books')) $('#page-books').style.display = 'none';
+        if ($('#page-cart')) $('#page-cart').style.display = 'none';
+        if ($('#page-rented')) $('#page-rented').style.display = 'none';
     }
 }
 
@@ -130,6 +147,7 @@ function renderAvailableBooks() {
         row.innerHTML = `
             <td><strong>${book.title}</strong></td>
             <td>${book.author}</td>
+            <td><span class="badge badge-info">${book.price ? book.price.toFixed(2) : '5.00'} PLN</span></td>
             <td><button class="btn-add" onclick="addToCart(${book.id})">+</button></td>
         `;
         booksTable.appendChild(row);
@@ -183,10 +201,16 @@ async function checkout() {
                 bookIds: cart.map(b => b.id)
             })
         });
-        if(response.ok) {
+        if (response.ok) {
+            const data = await response.json();
+3
+            currentUser.balance = data.newBalance;
+            localStorage.setItem('user', JSON.stringify(currentUser));
+            $('#user-balance').textContent = currentUser.balance.toFixed(2);
+
+            alert("Wypożyczono pomyślnie!");
             cart = [];
             updateCart();
-            getFieldsAndRented();
 
             $$('.nav-link').forEach(l => l.classList.remove('active'));
             $('[data-target="page-rented"]').classList.add('active');

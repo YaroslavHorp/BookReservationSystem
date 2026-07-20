@@ -25,9 +25,9 @@ public class User {
 
     @Getter
     @Setter
-    private double accountBalance;
+    private Double accountBalance = 20.0;
 
-    public User(String firstName, String lastName, String email, double accountBalance) {
+    public User(String firstName, String lastName, String email, Double accountBalance) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

@@ -24,9 +24,9 @@ public class Book {
     private int availableCopies;
 
     @Getter @Setter
-    private double price;
+    private Double price;
 
-    public Book(String title, String author, String isbn, double price, int availableCopies) {
+    public Book(String title, String author, String isbn, Double price, int availableCopies) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
