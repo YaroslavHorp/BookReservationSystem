@@ -119,6 +119,66 @@ body {
     background-color: rgba(231, 76, 60, 0.1);
 }
 
+/*WALLET*/
+.wallet-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 14px;
+    border-radius: 20px;
+    position: relative;
+    font-weight: 500;
+}
+
+.btn-deposit {
+    background-color: #2eb872;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s ease-in-out;
+}
+
+.btn-deposit:hover {
+    background-color: #25965c;
+}
+
+.deposit-popover {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background: #ffffff;
+    color: #333333;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 220px;
+}
+
+.deposit-popover form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.deposit-popover input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.deposit-popover button {
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    border: none;
+}
+
 /* MAIN */
 .container {
     display: block;

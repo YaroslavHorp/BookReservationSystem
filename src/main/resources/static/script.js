@@ -254,32 +254,61 @@ function updateCart() {
 }
 
 async function checkout() {
+    if (!cart || cart.length === 0) {
+        alert("Twój koszyk jest pusty!");
+        return;
+    }
+
+    if (!currentUser || !currentUser.id) {
+        alert("Musisz się zalogować, aby wypożyczyć książki!");
+        return;
+    }
+
+    const payload = {
+        userId: currentUser.id,
+        bookIds: cart.map(book => book.id)
+    };
+
     try {
-        const response = await fetch("http://localhost:8080/api/rentals/borrow", {
+        const response = await fetch('http://localhost:8080/api/rentals/borrow', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                userId: currentUser.id,
-                bookIds: cart.map(b => b.id)
-            })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
         });
+
+        const data = await response.json();
+
         if (response.ok) {
-            const data = await response.json();
-3
-            currentUser.balance = data.newBalance;
-            localStorage.setItem('user', JSON.stringify(currentUser));
-            $('#user-balance').textContent = currentUser.balance.toFixed(2);
+            alert(data.message || "Pomyślnie wypożyczono książki!");
 
-            alert("Wypożyczono pomyślnie!");
+            if (data.newBalance !== undefined) {
+                currentUser.accountBalance = data.newBalance;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+
+                const userBalanceSpan = $('#user-balance');
+                if (userBalanceSpan) {
+                    userBalanceSpan.textContent = Number(data.newBalance).toFixed(2);
+                }
+            }
+
             cart = [];
-            updateCart();
+            if (typeof updateCartUI === 'function') updateCartUI();
 
-            $$('.nav-link').forEach(l => l.classList.remove('active'));
-            $('[data-target="page-rented"]').classList.add('active');
-            $$('.page-section').forEach(s => s.classList.remove('active-section'));
-            $('#page-rented').classList.add('active-section');
+            if (typeof getFieldsAndRented === 'function') getFieldsAndRented();
+
+            const rentedTab = document.querySelector('[data-target="page-rented"]');
+            if (rentedTab) rentedTab.click();
+
+        } else {
+            alert("⚠️ " + (data.message || "Błąd podczas wypożyczania."));
         }
-    } catch (error) { console.error(error); }
+
+    } catch (error) {
+        console.error("Błąd połączenia z serwerem:", error);
+        alert("Błąd połączenia z serwerem.");
+    }
 }
 
 async function getFieldsAndRented() {
