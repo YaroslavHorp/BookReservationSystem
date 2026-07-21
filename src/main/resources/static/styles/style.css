@@ -67,7 +67,7 @@ body {
 }
 
 .page-section.active-section {
-    display: flex !important;
+    display: block !important;
 }
 
 #page-auth.active-section {
