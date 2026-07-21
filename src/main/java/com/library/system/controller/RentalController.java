@@ -81,4 +81,35 @@ public class RentalController {
         }
     }
 
+    @PostMapping("/deposit")
+    @Transactional
+    public ResponseEntity<?> depositMoney(@RequestBody Map<String, Object> request) {
+        try{
+            Long userId = Long.valueOf(request.get("userId").toString());
+            Double amount = Double.valueOf(request.get("amount").toString());
+
+            if(amount < 0){
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Kwota doładowania musi być większa od 0!"));
+            }
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Double currentBalance = user.getAccountBalance() != null ? user.getAccountBalance() : 0.0;
+            Double newBalance = currentBalance + amount;
+
+            user.setAccountBalance(newBalance);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(java.util.Map.of(
+                    "message", "Konto zostało pomyślnie doładowane!",
+                    "newBalance", newBalance
+            ));
+        }catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("message", "Błąd podczas doładowywania konta: " + e.getMessage()));
+        }
+    }
+
 }

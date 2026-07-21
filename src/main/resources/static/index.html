@@ -14,7 +14,19 @@
         <li><a href="#" class="nav-link active" data-target="page-books">Książki</a></li>
         <li><a href="#" class="nav-link" data-target="page-cart">Koszyk <span id="cart-count">(0)</span></a></li>
         <li><a href="#" class="nav-link" data-target="page-rented">Wypożyczone</a></li>
-        <li><a href="#" id="btn-logout" class="nav-link logout">Wyloguj (<span id="user-display"></span>) | <span id="user-balance">0.00</span> PLN</a></li>
+        <li><a href="#" id="btn-logout" class="nav-link logout">Wyloguj (<span id="user-display"></span>)</a></li>
+        <li class="wallet-container">
+            Portfel: <span id="user-balance">0.00</span> PLN
+            <button id="btn-deposit-toggle" class="btn-deposit" type="button" onclick="toggleDepositForm()">+ Doładuj</button>
+
+            <div id="deposit-popover" class="deposit-popover" style="display: none;">
+                <form id="deposit-form" onsubmit="submitDeposit(event)">
+                    <input type="number" id="deposit-amount" placeholder="Kwota (np. 50)" min="1" step="0.01" required />
+                    <button type="submit" class="btn-primary">Zatwierdź</button>
+                    <button type="button" onclick="toggleDepositForm(false)">Anuluj</button>
+                </form>
+            </div>
+        </li>
     </ul>
 </nav>
 

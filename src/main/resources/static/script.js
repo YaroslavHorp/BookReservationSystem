@@ -1,5 +1,3 @@
-//Dodac system cen za wypozyczenia
-
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
 
@@ -123,6 +121,70 @@ function initApp() {
         if ($('#page-books')) $('#page-books').style.display = 'none';
         if ($('#page-cart')) $('#page-cart').style.display = 'none';
         if ($('#page-rented')) $('#page-rented').style.display = 'none';
+    }
+}
+
+//DEPOSIT
+function toggleDepositForm(forceState = null) {
+    const popover = $('#deposit-popover');
+    if (!popover) return;
+
+    if (forceState !== null) {
+        popover.style.display = forceState ? 'block' : 'none';
+    } else {
+        popover.style.display = (popover.style.display === 'none' || !popover.style.display) ? 'block' : 'none';
+    }
+}
+
+async function submitDeposit(event) {
+    if (event) event.preventDefault();
+
+    const amountInput = $('#deposit-amount');
+    const amount = parseFloat(amountInput.value);
+
+    if (isNaN(amount) || amount <= 0) {
+        alert("Wprowadź poprawną kwotę większą od 0 PLN.");
+        return;
+    }
+
+    if (!currentUser || !currentUser.id) {
+        alert("Musisz być zalogowany, aby doładować konto!");
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:8080/api/rentals/deposit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId: currentUser.id,
+                amount: amount
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(data.message || "Konto zostało pomyślnie doładowane!");
+
+            currentUser.accountBalance = data.newBalance;
+            localStorage.setItem('user', JSON.stringify(currentUser));
+
+            const userBalance = $('#user-balance');
+            if (userBalance) {
+                userBalance.textContent = Number(data.newBalance).toFixed(2);
+            }
+
+            amountInput.value = '';
+            toggleDepositForm(false);
+        } else {
+            alert(data.message || "Błąd podczas doładowywania konta.");
+        }
+    } catch (error) {
+        console.error("Błąd połączenia:", error);
+        alert("Wystąpił błąd podczas połączenia z serwerem.");
     }
 }
 
